@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 #
 # ml 2016
 #
@@ -41,38 +42,10 @@
 # category	= empty
 # tags		= empty
 #
-### paymode
-# 0 = none			ABSCHLUSS
-# 1 = kreditkarte		na
-# 2 = schecks			na
-# 3 = bargeld 			GELDAUTOMAT
-# 4 = ueberweisung		ONLINE-UEBERWEISUNG
-# 5 = zwischen konten		"SEPA UEBERTRAG SOLL"
-# 6 = einzugsermaechtigung	na
-# 7 = dauerauftrag		DAUERAUFTRAG
-# 8 = kartenzahlung		KARTENZAHLUNG, "SONSTIGER EINZUG"
-# 9 = einzahlung		GUTSCHRIFT,EINZAHLUNG,LOHN  GEHALT, "SEPA UEBERTRAG HABEN"
-# 10= FI Abgabe			na
-# 11= lastschrift		FOLGELASTSCHRIFT/LASTSCHRIFT/SEPA-ELV-LASTSCHRIFT/ERSTLASTSCHRIFT
 
-paymode = {
-	"ABSCHLUSS": 0,
-	"GELDAUTOMAT": 3,
-	"ONLINE-UEBERWEISUNG": 4,
-	"SEPA UEBERTRAG SOLL": 4,
-	"DAUERAUFTRAG": 7,
-	"KARTENZAHLUNG": 8,
-	"SONSTIGER EINZUG": 8,
-	"GUTSCHRIFT": 9,
-	"EINZAHLUNG": 9,
-	"LOHN  GEHALT": 9,
-	"SEPA UEBERTRAG HABEN": 9,
-	"BAR": 9,
-	"FOLGELASTSCHRIFT":11,
-	"LASTSCHRIFT":11,
-	"SEPA-ELV-LASTSCHRIFT":11,
-	"ERSTLASTSCHRIFT":11,
-}
+import logging;
+from string import Template
+from paymode import paymodes
 
 
 ### imports
@@ -84,7 +57,7 @@ import datetime
 
 ### parse
 parser = argparse.ArgumentParser()
-parser.add_argument("csv", help="csv from mbs")
+parser.add_argument("csv", help="csv from SPK")
 args = parser.parse_args()
 incsv = args.csv
 
@@ -101,30 +74,43 @@ def convert_date(date):
 
 ### read csv
 try:
-	with open(incsv) as csvfile:
+	with open(incsv, encoding="utf-8") as csvfile:
 		reader = csv.reader(csvfile,delimiter=';', quoting=csv.QUOTE_NONE)
+		counter = 1
 		firstline = True
+		
 		for row in reader:
-			# remove first line
 			if firstline:
 				firstline = False
 				continue
 
-			#date;paymode;info;payee;memo;balance;--cat;--tag
-			print "%s;%s;%s;%s;%s;%s;;" % (
-				convert_date(remove_quotes(row[2])),
-				paymode[remove_quotes(row[3])],
-				remove_quotes(row[3]),
-				remove_quotes(row[5]),
-				remove_quotes(row[4]),
-				remove_quotes(row[8]),
-			)
-
-
-except IOError:
-	print incsv + " not found"
+			try:
+				date = convert_date(remove_quotes(row[1]))
+				paymode = paymodes[remove_quotes(row[3].upper())]
+				info = remove_quotes(row[3])
+				payee = remove_quotes(row[5])
+				memo = remove_quotes(row[4])[:10]
+				balance = remove_quotes(row[8])
+				
+				t = Template('$name,$paymode,$info,$payee,$memo,$balance')
+				s = t.substitute(name=date, paymode=paymode, info=info, payee=payee, memo=memo, balance=balance)
+				print(s)
+			except KeyError as e:
+				print("There is an error" + unicode(e).encode("utf-8"))
+			except AttributeError as e:
+				print("error", e)
+			# ;paymode;info;payee;memo;balance;--cat;--tag
+			# print "%s;%s;%s;%s;%s;%s;;" % (
+			# 	remove_quotes(row[3]),
+			# 	remove_quotes(row[5]),
+			# 	remove_quotes(row[4]),
+			# 	remove_quotes(row[8]),
+			# )
+except IOError as e:
+	print(e)
+	print(incsv + " not found")
 
 except:
-	print "Unexpected error:", sys.exc_info()[0]
+	print("Unexpected error:", sys.exc_info()[0])
 else:
 	csvfile.close()

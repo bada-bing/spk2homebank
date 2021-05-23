@@ -1,0 +1,36 @@
+# http://homebank.free.fr/help/00-lexicon.html#payment
+# 0 = none			ABSCHLUSS
+# 1 = kreditkarte		na
+# 2 = schecks			na
+# 3 = bargeld 			GELDAUTOMAT
+# 4 = ueberweisung		ONLINE-UEBERWEISUNG
+# 5 = zwischen konten		"SEPA UEBERTRAG SOLL"
+# 6 = einzugsermaechtigung	na
+# 7 = dauerauftrag		DAUERAUFTRAG
+# 8 = kartenzahlung		KARTENZAHLUNG, "SONSTIGER EINZUG"
+# 9 = einzahlung		GUTSCHRIFT,EINZAHLUNG,LOHN  GEHALT, "SEPA UEBERTRAG HABEN"
+# 10= FI Abgabe			na
+# 11= lastschrift		FOLGELASTSCHRIFT/LASTSCHRIFT/SEPA-ELV-LASTSCHRIFT/ERSTLASTSCHRIFT
+
+paymodes = {
+	"ABSCHLUSS": 0,
+	"GELDAUTOMAT": 3,
+	"ONLINE-UEBERWEISUNG": 4,
+	"ÜBERWEISUNG ONLINE": 4,
+	u'\xdcBERWEISUNG ONLINE':4,
+	"SEPA UEBERTRAG SOLL": 4,
+	"DAUERAUFTRAG": 7,
+	"KARTENZAHLUNG": 8,
+	"SONSTIGER EINZUG": 8,
+	"GUTSCHRIFT": 9,
+	"EINZAHLUNG": 9,
+	"LOHN  GEHALT": 9,
+	"SEPA UEBERTRAG HABEN": 9,
+	"BAR": 9,
+	"BARGELDAUSZ.DEBITK.GA": 9,
+	"FOLGELASTSCHRIFT":11,
+	"LASTSCHRIFT":11,
+	"SEPA-ELV-LASTSCHRIFT":11,
+	"ERSTLASTSCHRIFT":11,
+	"ENTGELTABRECHNUNG": 11
+}
